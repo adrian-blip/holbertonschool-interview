@@ -1,47 +1,59 @@
 #!/usr/bin/python3
-""" script that reads stdin line by line and computes metrics """
+
+"""
+Log Parser
+"""
+
+
+import sys
+
+
+total_file_size = {'size': 0}
+codes = {
+    '200': 0,
+    '301': 0,
+    '400': 0,
+    '401': 0,
+    '403': 0,
+    '404': 0,
+    '405': 0,
+    '500': 0
+}
+
+
+def print_data():
+    """
+        Prints the resume
+    """
+    print('File size: {}'.format(total_file_size['size']))
+    for key in sorted(codes.keys()):
+        if codes[key] > 0:
+            print('{}: {}'.format(key, codes[key]))
+
+
+def operate_resume(line):
+    """
+        Operates with the resume stats
+    """
+    try:
+        line = line.split(' ')
+        size = line[-1]
+        total_file_size['size'] += int(size)
+        if line[-2] in codes:
+            codes[line[-2]] += 1
+    except Exception as e:
+        pass
+
 
 if __name__ == '__main__':
-
-    import sys
-
-    def print_results(statusCodes, fileSize):
-        """ Print statistics """
-        print("File size: {:d}".format(fileSize))
-        for statusCode, times in sorted(statusCodes.items()):
-            if times:
-                print("{:s}: {:d}".format(statusCode, times))
-
-    statusCodes = {"200": 0,
-                   "301": 0,
-                   "400": 0,
-                   "401": 0,
-                   "403": 0,
-                   "404": 0,
-                   "405": 0,
-                   "500": 0
-                   }
-    fileSize = 0
-    n_lines = 0
-
+    num_lines = 1
     try:
-        """ Read stdin line by line """
         for line in sys.stdin:
-            if n_lines != 0 and n_lines % 10 == 0:
-                """ After every 10 lines, print from the beginning """
-                print_results(statusCodes, fileSize)
-            n_lines += 1
-            data = line.split()
-            try:
-                """ Compute metrics """
-                statusCode = data[-2]
-                if statusCode in statusCodes:
-                    statusCodes[statusCode] += 1
-                fileSize += int(data[-1])
-            except:
-                pass
-        print_results(statusCodes, fileSize)
+            operate_resume(line)
+            if num_lines % 10 == 0:
+                print_data()
+            num_lines += 1
     except KeyboardInterrupt:
-        """ Keyboard interruption, print from the beginning """
-        print_results(statusCodes, fileSize)
+        print_data()
         raise
+    print_data()

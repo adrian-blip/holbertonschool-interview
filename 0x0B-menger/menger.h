@@ -1,8 +1,12 @@
-#ifndef _MERGE_H
-#define _MERGE_H
+#ifndef MENGER_H
+#define MENGER_H
+
+/* INCLUDED LIBRARIES */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-void menger(int level);
-#endif
 
+/* FUNCTION PROTOTYPES */
+void menger(int level);
+
+#endif
